@@ -140,3 +140,48 @@
   task: lore-safe proofreading challenger test
   notes: stayed inside output contract and preserved terms and tone, but failed challenger review due to core grammar errors
 
+
+- run id: run-2026-03-13-017
+  date: 2026-03-13
+  model: qwen2.5:7b
+  prompt file: prompts/lore-safe-proofread-003.md
+  input file: inputs/lore-safe-test-001.md
+  output file: outputs/qwen2.5-7b-lore-safe-test-001-run-2026-03-13-017.md
+  task: lore-safe proofreading challenger test
+  notes: qwen2.5:7b challenger run against current qwen2.5:14b baseline
+
+- run id: run-2026-03-13-018
+  date: 2026-03-13
+  model: gemma3:12b
+  prompt file: prompts/lore-safe-proofread-003.md
+  input file: inputs/lore-safe-test-001.md
+  output file: outputs/gemma3-12b-lore-safe-test-001-run-2026-03-13-018.md
+  task: lore-safe proofreading challenger test
+  notes: gemma3:12b challenger run against current qwen2.5:14b baseline
+
+- run id: run-2026-03-13-019
+  date: 2026-03-13
+  model: qwen2.5:14b
+  prompt file: prompts/lore-safe-proofread-004.md
+  input file: inputs/lore-safe-test-001.md
+  output file: outputs/qwen2.5-14b-lore-safe-test-001-run-2026-03-13-019.md
+  task: lore-safe proofreading prompt challenger test
+  notes: qwen2.5:14b test of prompt 004 against current prompt 003 baseline
+
+- run id: run-2026-03-13-020
+  date: 2026-03-13
+  model: llama3.1:8b
+  prompt file: prompts/lore-safe-proofread-003.md
+  input file: inputs/lore-safe-test-001.md
+  output file: outputs/run-2026-03-13-020-lore-safe-test-001-llama3.1-8b.md
+  task: lore-safe-proofreading
+  notes: challenger run for llama3.1:8b against current qwen2.5:14b baseline
+
+- run id: run-2026-03-13-021
+  date: 2026-03-13
+  model: mistral:7b-instruct
+  prompt file: prompts/lore-safe-proofread-003.md
+  input file: inputs/lore-safe-test-001.md
+  output file: outputs/run-2026-03-13-021-lore-safe-test-001-mistral-7b-instruct.md
+  task: lore-safe-proofreading
+  notes: challenger run for mistral:7b-instruct against current qwen2.5:14b baseline

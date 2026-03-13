@@ -80,3 +80,25 @@ This registry should record current status cleanly without duplicating entries f
   best confirmed run: run-2026-03-13-018
   latest successful verification runs: run-2026-03-13-018
   notes: returned clean contract-compliant output and was notably fast, but failed baseline challenge due to clear grammar errors and additional editorial drift relative to the current qwen2.5:14b winner
+
+- model name: llama3.1:8b
+  source: Ollama
+  size: 8b
+  quant: unknown
+  runtime: local
+  status: rejected for current baseline
+  confirmed use case: lore-safe proofreading challenger
+  best confirmed run: run-2026-03-13-020
+  latest successful verification runs: run-2026-03-13-020
+  notes: returned clean and fast output, but failed the baseline challenge due to a clear grammar error (`were`) and an inferior optional phrasing substitution (`sat badly in him`); not strong enough to replace the current qwen2.5:14b baseline
+
+- model name: mistral:7b-instruct
+  source: Ollama
+  size: 7b
+  quant: unknown
+  runtime: local
+  status: rejected for current baseline
+  confirmed use case: lore-safe proofreading challenger
+  best confirmed run: run-2026-03-13-021
+  latest successful verification runs: run-2026-03-13-021
+  notes: returned grammatically clean output, but failed the baseline challenge due to substantial editorial drift and normalized too many acceptable literary phrasings instead of performing minimal correction
