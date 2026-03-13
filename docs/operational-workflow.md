@@ -285,6 +285,8 @@ Example shape:
 
 This record format is the expected verification target after successful wrapper-driven runs.
 
+The log writer currently appends a blank line before each new run record, so entries are visually separated in `registry/runs.md`.
+
 ---
 
 ## Output filename behavior
@@ -391,4 +393,4 @@ Use this sequence for repeatable manual execution:
 7. verify log entry in `registry/runs.md`
 8. inspect output quality before changing anything else
 
-This keeps the workflow controlled, auditable, and easy to debug
+This keeps the workflow controlled, auditable, and easy to debu
