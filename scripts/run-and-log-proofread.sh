@@ -10,13 +10,16 @@ fi
 
 if [ "$#" -ne 5 ] && [ "$#" -ne 6 ] && [ "$#" -ne 7 ] && [ "$#" -ne 8 ]; then
   echo "Usage:"
-  echo "  $0 [--dry-run] [RUN_ID] [DATE] MODEL PROMPT_FILE INPUT_FILE [OUTPUT_FILE] TASK NOTES"
+  echo "  $0 [--dry-run] MODEL PROMPT_FILE INPUT_FILE TASK NOTES"
+  echo "  $0 [--dry-run] MODEL PROMPT_FILE INPUT_FILE OUTPUT_FILE TASK NOTES"
+  echo "  $0 [--dry-run] RUN_ID MODEL PROMPT_FILE INPUT_FILE OUTPUT_FILE TASK NOTES"
+  echo "  $0 [--dry-run] RUN_ID DATE MODEL PROMPT_FILE INPUT_FILE OUTPUT_FILE TASK NOTES"
   echo
-  echo "Accepted forms:"
-  echo "  8 args: RUN_ID DATE MODEL PROMPT_FILE INPUT_FILE OUTPUT_FILE TASK NOTES"
-  echo "  7 args: RUN_ID MODEL PROMPT_FILE INPUT_FILE OUTPUT_FILE TASK NOTES"
-  echo "  6 args: MODEL PROMPT_FILE INPUT_FILE OUTPUT_FILE TASK NOTES"
-  echo "  5 args: MODEL PROMPT_FILE INPUT_FILE TASK NOTES"
+  echo "Behavior:"
+  echo "  5 args: auto-generate RUN_ID, DATE, and OUTPUT_FILE"
+  echo "  6 args: auto-generate RUN_ID and DATE"
+  echo "  7 args: auto-generate DATE"
+  echo "  8 args: use all provided values as-is"
   exit 1
 fi
 
