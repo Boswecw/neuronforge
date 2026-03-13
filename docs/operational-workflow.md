@@ -46,6 +46,23 @@ Runs a proofreading job from:
 
 It writes the model output to the requested output path.
 
+Execution behavior:
+
+- reads the full prompt file first
+- inserts a literal `PASSAGE:` separator
+- appends the full input file after that separator
+- sends the combined payload to `ollama run`
+
+Effective input structure:
+
+    <prompt file contents>
+
+    PASSAGE:
+
+    <input file contents>
+
+This separator is part of the current proofreading contract and should be treated as intentional unless the runner design is changed.
+
 Current hardening includes:
 
 - checks that `ollama` exists on `PATH`
