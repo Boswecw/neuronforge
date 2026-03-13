@@ -130,3 +130,13 @@
   output file: outputs/qwen2.5-14b-lore-safe-test-001-run-2026-03-13-015.md
   task: proofread
   notes: post-hardening live run
+
+- run id: run-2026-03-13-016
+  date: 2026-03-13
+  model: gemma3:4b
+  prompt file: prompts/lore-safe-proofread-003.md
+  input file: inputs/lore-safe-test-001.md
+  output file: outputs/gemma3-4b-lore-safe-test-001-run-2026-03-13-016.md
+  task: lore-safe proofreading challenger test
+  notes: stayed inside output contract and preserved terms and tone, but failed challenger review due to core grammar errors
+

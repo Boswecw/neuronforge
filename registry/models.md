@@ -46,3 +46,15 @@ This registry should record current status cleanly without duplicating entries f
   best confirmed run: run-2026-03-13-005
   latest successful verification runs: run-2026-03-13-014, run-2026-03-13-015
   notes: current best confirmed lore-safe proofreading model; clean output, no reasoning leakage observed in confirmed baseline runs, preserves protected terms and literary tone better than the prior baseline model, still shows occasional non-minimal phrasing drift, somewhat slow, and may hit runtime memory limits depending on available free memory
+
+- model name: gemma3:4b
+  source: Ollama
+  size: 4b
+  quant: unknown
+  runtime: local
+  status: rejected for current baseline
+  confirmed use case: lore-safe proofreading challenger
+  best confirmed run: run-2026-03-13-016
+  latest successful verification runs: run-2026-03-13-016
+  notes: stayed inside the return-only-text contract and preserved protected terms and literary tone, but failed basic proofreading quality with clear grammar errors; not strong enough to challenge the current qwen2.5:14b baseline
+
