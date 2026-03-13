@@ -69,3 +69,14 @@ This registry should record current status cleanly without duplicating entries f
   best confirmed run: run-2026-03-13-017
   latest successful verification runs: run-2026-03-13-017
   notes: stayed inside the return-only-text contract and preserved protected terms and meaning, but showed more editorial phrasing drift than the current qwen2.5:14b baseline and did not clearly improve proofreading quality
+
+- model name: gemma3:12b
+  source: Ollama
+  size: 12b
+  quant: unknown
+  runtime: local
+  status: rejected for current baseline
+  confirmed use case: lore-safe proofreading challenger
+  best confirmed run: run-2026-03-13-018
+  latest successful verification runs: run-2026-03-13-018
+  notes: returned clean contract-compliant output and was notably fast, but failed baseline challenge due to clear grammar errors and additional editorial drift relative to the current qwen2.5:14b winner
