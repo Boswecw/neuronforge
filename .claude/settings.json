@@ -23,7 +23,8 @@
       "Bash(python -m pytest tests/test_run_manager_bounds.py -v --tb=short)",
       "Bash(python -m pytest tests/test_cors_validation.py -v --tb=short)",
       "Bash(python -m pytest tests/test_signature_format.py -v --tb=short)",
-      "Bash(python -m pytest --tb=short -q --co)"
+      "Bash(python -m pytest --tb=short -q --co)",
+      "Bash(git push:*)"
     ],
     "additionalDirectories": [
       "/home/charlie/Forge/ecosystem/Forge_Command/src/lib/types",
