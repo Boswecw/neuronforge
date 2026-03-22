@@ -194,3 +194,89 @@ The `analyze.style.scene.v1` capability with `qwen2.5:14b` produces valid, parse
 ## Next required decision
 
 Review the voice_consistency miscategorization pattern more closely. Run at least 3 additional scenes specifically designed as POV-shift tests to determine whether scene-04's result was a model edge case or a systematic dimension interpretation gap. If systematic, consider whether the prompt should clarify what voice_consistency measures. Once additional POV-shift tests are complete, assess whether the lane is ready for `candidate_baseline` promotion.
+
+---
+
+## Challenger run: qwen3:14b (2026-03-21)
+
+Model: qwen3:14b
+Date: 2026-03-21
+All 5 runs returned `schema_validation_status: valid`. No warnings on any run. Evidence spans count: 3 per scene (vs 2 per scene for qwen2.5:14b baseline).
+
+### Dimension score comparison
+
+| Scene | Dimension | qwen2.5:14b | qwen3:14b | Delta |
+|-------|-----------|-------------|-----------|-------|
+| 01-clean | clarity | 0.90 | 0.95 | +0.05 |
+| 01-clean | flow | 0.85 | 0.92 | +0.07 |
+| 01-clean | voice_consistency | 0.75 | 0.98 | +0.23 |
+| 01-clean | sentence_variety | 0.95 | 0.88 | -0.07 |
+| 01-clean | pacing | 0.80 | 0.85 | +0.05 |
+| 01-clean | confidence | 0.90 | 0.90 | 0.00 |
+| 02-dense | clarity | 0.80 | 0.70 | -0.10 |
+| 02-dense | flow | 0.75 | 0.85 | +0.10 |
+| 02-dense | voice_consistency | 1.00 | 0.95 | -0.05 |
+| 02-dense | sentence_variety | 0.60 | 0.80 | +0.20 |
+| 02-dense | pacing | 0.60 | 0.70 | +0.10 |
+| 02-dense | confidence | 0.90 | 0.80 | -0.10 |
+| 03-flat | clarity | 0.90 | 0.95 | +0.05 |
+| 03-flat | flow | 0.60 | 0.75 | +0.15 |
+| 03-flat | voice_consistency | 0.50 | 0.90 | +0.40 |
+| 03-flat | sentence_variety | 0.30 | 0.60 | +0.30 |
+| 03-flat | pacing | 0.70 | 0.70 | 0.00 |
+| 03-flat | confidence | 0.80 | 0.85 | +0.05 |
+| 04-voice-drift | clarity | 0.90 | 0.90 | 0.00 |
+| 04-voice-drift | flow | 0.70 | 0.85 | +0.15 |
+| 04-voice-drift | voice_consistency | 0.85 | 0.90 | +0.05 |
+| 04-voice-drift | sentence_variety | 0.65 | 0.80 | +0.15 |
+| 04-voice-drift | pacing | 0.70 | 0.85 | +0.15 |
+| 04-voice-drift | confidence | 0.90 | 0.90 | 0.00 |
+| 05-dialogue-heavy | clarity | 0.80 | 0.90 | +0.10 |
+| 05-dialogue-heavy | flow | 0.75 | 0.85 | +0.10 |
+| 05-dialogue-heavy | voice_consistency | 0.90 | 0.90 | 0.00 |
+| 05-dialogue-heavy | sentence_variety | 0.60 | 0.75 | +0.15 |
+| 05-dialogue-heavy | pacing | 0.80 | 0.85 | +0.05 |
+| 05-dialogue-heavy | confidence | 0.85 | 0.85 | 0.00 |
+
+### Schema reliability
+
+qwen3:14b: 5/5 valid. No warnings. Evidence spans: 3 per scene consistently (vs 2 per scene for qwen2.5:14b). Schema reliability = 1.00. Matches baseline.
+
+### Evidence span quality
+
+qwen3:14b produces 3 evidence spans per scene vs 2 for qwen2.5:14b. Span citations are specific and well-reasoned. On scene-04, qwen3 spans include a direct citation of the first-person intrusion text (`"I have always been a careful person..."`) at chars 142–163 and an explicit "Perspective shift" label on the third-person-to-first-person transition. This is meaningfully more informative than the qwen2.5:14b span which cited the reflective narration block (145–238) under the label "flow disruption" only.
+
+### voice_consistency on scene-04
+
+The key calibration concern from the baseline run was that qwen2.5:14b scored voice_consistency 0.85 on scene-04 (designed as a POV-shift scene) despite correctly locating the first-person intrusion in the evidence spans. The model attributed the issue to pacing/flow rather than voice_consistency.
+
+**qwen3:14b result:**
+
+- voice_consistency score: **0.90** — higher than the baseline 0.85. The POV shift miscategorization is not resolved; it is slightly worse at the dimension score level.
+- However, qwen3 produced an explicit "Perspective shifts" observation finding with the detail: "The transition from third-person narration to first-person introspection is handled but may require tighter integration for seamless immersion." This correctly names the POV shift as a finding.
+- Evidence span at 142–163 directly quotes the first-person intrusion (`I have always been a careful person...`) as evidence, and span at 332–354 labels the return to third-person as a "Perspective shift."
+- The low-priority recommendation "Refine perspective transitions" explicitly mentions smoothing the shift between third-person narration and first-person introspection.
+
+**Assessment:** qwen3:14b identifies the POV shift more explicitly in its findings and evidence spans than qwen2.5:14b, which only mentioned "reflective narration disrupting flow." However, neither model correctly lowers voice_consistency to reflect the POV drift; both produce high scores (0.85 and 0.90) on a scene specifically designed to exhibit voice inconsistency. The systematic pattern is confirmed: the voice_consistency dimension score does not reliably penalize POV drift under the current prompt. This is a prompt-level calibration gap, not a model capability gap — both models can locate and label the shift in findings and evidence spans but do not translate it to a lower voice_consistency score.
+
+qwen3:14b is marginally better at *labeling* the issue explicitly (observation finding vs. no voice label in qwen2.5), but the score-level miscategorization is identical in character (high voice_consistency score despite POV shift).
+
+### General scoring behavior differences
+
+qwen3:14b scores are systematically higher across most dimensions and most scenes. Notable patterns:
+- Sentence_variety: qwen3 scored this dimension considerably higher than qwen2.5 on scenes 02-dense (+0.20), 03-flat (+0.30), 04-voice-drift (+0.15), and 05-dialogue-heavy (+0.15). This reduces the discriminative signal on scenes designed to exhibit low sentence variety.
+- On scene-03-flat, qwen3 scored sentence_variety 0.60 while qwen2.5 scored 0.30. Scene-03 was specifically designed to exhibit extreme sentence flatness. The qwen2.5:14b score of 0.30 is the more diagnostically correct signal; qwen3:14b undershoots the severity.
+- voice_consistency is inflated on scene-03-flat (qwen3: 0.90 vs qwen2.5: 0.50). qwen2.5:14b's lower score is more accurate for a scene with minimal authorial voice.
+- On scene-02-dense, qwen3 correctly scores clarity lower (0.70 vs 0.80), which is directionally better. Sentence_variety is over-scored (0.80 vs 0.60); qwen2.5:14b's 0.60 is more accurate for the dense prose scene.
+
+### Judgment
+
+**Neither model resolves the voice_consistency miscategorization on scene-04.** The systematic issue is confirmed as a prompt-level calibration gap: the prompt does not explicitly instruct the model to penalize POV-perspective drift in the voice_consistency score. Both models detect the POV shift in evidence spans but score voice_consistency high.
+
+**qwen3:14b does not outperform qwen2.5:14b on the key calibration concern.** On the dimension score level, qwen3 scores voice_consistency *higher* (0.90 vs 0.85) on scene-04. Its advantage is in richer finding labels and better evidence span specificity.
+
+**qwen3:14b shows score inflation across most dimensions**, reducing discriminative power on the scenes designed to test low-scoring behavior (scene-02-dense, scene-03-flat). qwen2.5:14b's more conservative scoring profile is a better fit for diagnostic use cases where low scores are meaningful signals.
+
+**qwen3:14b is not the preferred model candidate** based on this evaluation. qwen2.5:14b remains the baseline. The primary next action should be prompt calibration to define voice_consistency as including POV fidelity, tested against both models, rather than a model switch.
+
+**next_required_decision update:** The POV-shift miscategorization is confirmed as systematic across both models and is a prompt-level gap. The prompt should be updated to define voice_consistency to include POV fidelity. Both models should be re-tested against the updated prompt on scene-04 and at least 2 additional POV-shift scenes before any candidate_baseline decision.
