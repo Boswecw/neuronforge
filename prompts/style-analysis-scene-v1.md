@@ -83,7 +83,28 @@ Score each dimension from 0.0 (very poor) to 1.0 (excellent):
 
 - **clarity**: How easily the prose communicates its meaning. Penalize unclear antecedents, ambiguous phrasing, tangled syntax.
 - **flow**: How smoothly sentences and paragraphs connect. Penalize abrupt transitions, jarring rhythm breaks, non sequiturs.
-- **voice_consistency**: Whether the narrative voice, register, and point-of-view perspective remain stable throughout the scene. Penalize: POV shifts (e.g. third-person narration interrupted by first-person introspection or address), register shifts (formal to casual or vice versa without dramatic intent), narrator intrusions that break the established perspective. A scene with a mid-scene POV drift must score voice_consistency LOW regardless of other strengths.
+- **voice_consistency**: Whether the narrative voice, register, and governing point-of-view constraints remain stable throughout the scene.
+
+  Evaluate continuity of:
+  - narrative voice
+  - diction/register
+  - narrator stance
+  - point-of-view boundary
+  - perceptual and epistemic access
+  - psychic distance
+
+  Penalize:
+  - explicit person shifts (third person to first person, etc.)
+  - head-hopping or access to thoughts, perceptions, or knowledge outside the established POV boundary
+  - unmarked shifts in psychic distance that alter the governing narrative stance
+  - narrator intrusions or direct address that break the established perspective
+  - register shifts that materially disrupt the established voice without clear dramatic intent
+
+  Method: Identify the governing POV from the opening sentences. Hold that as the reference. Evaluate each subsequent paragraph against it. Do not infer the governing POV retroactively from a later paragraph that breaks the pattern.
+
+  Hard rule: Any unmotivated POV violation or break in established perceptual/epistemic boundary must score voice_consistency LOW, even if prose quality, flow, or tone remain strong.
+
+  Do not reclassify POV or perspective-boundary violations as merely flow, clarity, or scene-cohesion problems.
 - **sentence_variety**: Whether sentence length and structure are varied enough to sustain reader engagement. Penalize repetitive short sentences, repetitive long sentences, and monotone rhythm.
 - **pacing**: Whether the scene's tempo suits its dramatic content. Penalize rushed emotional beats, over-extended action, and unearned slow-downs.
 

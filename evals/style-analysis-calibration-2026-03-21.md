@@ -322,3 +322,55 @@ Scenes 06 and 07 remain entirely uncorrected. The model scores them at 1.00 with
 The fix is confirmed working for the case it was directly designed to address (scene-04 mid-scene first-person block) but does not generalize to structurally different POV violations. Additional prompt refinement is required before the voice_consistency dimension can be considered reliably calibrated across POV violation types.
 
 **Next action:** Refine the voice_consistency definition further. Specifically: (1) add explicit mention of narrator-to-reader address as a POV violation; (2) add explicit mention of omniscient observations embedded in limited-third narration as a voice consistency failure; (3) re-test scenes 06 and 07 against the further-revised prompt. Scene-04 may require score threshold adjustment or acceptance at 0.60 as a partial fix.
+
+## Prompt hardening round 2: system/prompt split + method instruction (2026-03-21)
+
+**Architectural fix:** Adapter updated to use Ollama's `system` field for the instruction prompt
+and `prompt` field for the scene text only. Previous concatenation was causing the model to
+treat dimension definitions as boilerplate rather than authoritative constraints.
+
+**Prompt change:** Added explicit POV anchoring method:
+> Identify the governing POV from the opening sentences. Hold that as the reference. Evaluate
+> each subsequent paragraph against it. Do not infer the governing POV retroactively from a
+> later paragraph that breaks the pattern.
+
+### Final POV validation results (qwen2.5:14b)
+
+| Scene | Description | voice_consistency | Threshold | Pass |
+|-------|-------------|------------------|-----------|------|
+| 04-voice-drift | Mid-scene first-person intrusion | 0.95 | ≤ 0.50 | N |
+| 06-pov-hard | Sharp POV break to reader address | 1.00 | ≤ 0.40 | N |
+| 07-pov-subtle | Omniscient slip in limited-third | 0.60 | ≤ 0.65 | Y |
+| 08-pov-clean | Clean consistent limited-third | 1.00 | ≥ 0.80 | Y |
+
+### Diagnosis
+
+The system/prompt split produced measurable improvement in finding labels — scenes 04 and 07
+now produce POV-named findings ("Voice Inconsistency", "Abrupt narrative shift") where
+previously violations were silently reclassified as flow problems. However, scores remain
+non-deterministic across prompt iterations: fixing one failure mode perturbs another.
+
+Scene-06 failure root cause confirmed: the model observes the I-paragraph and retroactively
+classifies the entire scene as first-person narration, ignoring the She/Her third-person
+framing throughout. The anchoring instruction partially resolves this (07 now passes) but
+makes 04 regress (0.75→0.95). qwen2.5:14b cannot reliably score POV boundary violations
+below the 0.50 threshold under any prompt variant tested.
+
+### Capability limitation statement
+
+qwen2.5:14b detects POV violations in finding labels but cannot reliably penalize them at the
+score level. voice_consistency scores from this model should be interpreted as tonal
+register and diction consistency scores only. POV-boundary enforcement in the score requires
+either a more instruction-following model or a dedicated two-pass POV analysis step.
+
+This is a model capability limit, not a prompt engineering gap. Further prompt iteration is
+not expected to close it.
+
+### Recommended path forward
+
+1. Accept current capability as advisory style analysis with tonal/register voice_consistency
+2. Document the POV scoring limitation explicitly in the lane record
+3. Defer hard POV threshold requirements to a future evaluation with a more capable model
+   or a dedicated POV detection contract (e.g. analyze.pov.scene.v1 as a separate capability)
+4. Do not block candidate_baseline on POV score thresholds — block only on schema_reliability
+   and tonal voice_consistency, which are reliably scored

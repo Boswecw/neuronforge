@@ -32,12 +32,6 @@ def _load_system_prompt() -> str:
         raise RuntimeError(f"Could not read prompt file {PROMPT_FILE}: {exc}") from exc
 
 
-def _build_user_content(scene_text: str) -> str:
-    """Combine the system prompt with the scene text, matching the bash executor pattern."""
-    system_prompt = _load_system_prompt()
-    return f"{system_prompt}\n\n{scene_text}"
-
-
 def call_ollama(
     scene_text: str,
     model: str = DEFAULT_MODEL,
@@ -46,20 +40,21 @@ def call_ollama(
     """
     Send the scene text to the local Ollama model and return raw output.
 
-    Uses the Ollama /api/generate endpoint with streaming disabled so we
-    get a single response body.  This mirrors the `ollama run <model>`
-    CLI invocation used in run-continuity-adjacent-scene.sh.
+    Uses the Ollama /api/generate endpoint with the system prompt in the
+    dedicated `system` field so instruction-level constraints (dimension
+    definitions, hard rules) are treated as authoritative by the model.
 
     Raises:
         RuntimeError: if the Ollama server is unreachable or returns an
                       error response.
     """
-    prompt = _build_user_content(scene_text)
+    system_prompt = _load_system_prompt()
 
     payload = json.dumps(
         {
             "model": model,
-            "prompt": prompt,
+            "system": system_prompt,
+            "prompt": scene_text,
             "stream": False,
         }
     ).encode("utf-8")
