@@ -412,3 +412,109 @@ and evidence spans but cannot consistently penalise them at the score level.
 The split is the right schema design. The model limitation is unchanged. Proceed with
 pov_fidelity in the schema; require a more capable model or a dedicated POV contract
 before treating pov_fidelity scores as reliable gate signals.
+
+---
+
+## Multi-model POV validation survey (2026-03-21)
+
+After confirming that qwen2.5:14b cannot reliably produce low pov_fidelity scores for hard
+POV violations, five additional models were tested against the 4 POV validation scenes using
+the final 6-dimension prompt with dedicated `pov_fidelity` dimension.
+
+**Models tested:** qwen3:14b (post-split re-run), cogito:14b, gemma3:12b, phi4-reasoning
+
+**Thresholds:**
+
+| Scene | Description | Threshold |
+|-------|-------------|-----------|
+| 04-voice-drift | Mid-scene first-person intrusion in close-third | pov_fidelity ≤ 0.50 |
+| 06-pov-hard | Direct reader address breaking limited-third | pov_fidelity ≤ 0.40 |
+| 07-pov-subtle | Omniscient aside embedded in limited-third | pov_fidelity ≤ 0.65 |
+| 08-pov-clean | Clean limited-third, no violations | pov_fidelity ≥ 0.80 |
+
+### Results
+
+| Scene | qwen2.5:14b | qwen3:14b | cogito:14b | gemma3:12b | phi4-reasoning |
+|-------|-------------|-----------|------------|------------|----------------|
+| 04-voice-drift (≤0.50) | FAIL (1.00) | FAIL (1.00) | **PASS (0.35)** | **PASS (0.50)** | timed out |
+| 06-pov-hard (≤0.40) | FAIL (1.00) | FAIL (1.00) | FAIL (1.00) | FAIL (0.70) | timed out |
+| 07-pov-subtle (≤0.65) | PASS (0.60) | FAIL (1.00) | FAIL (0.85) | FAIL (1.00) | timed out |
+| 08-pov-clean (≥0.80) | PASS (1.00) | PASS (1.00) | PASS (0.95) | PASS (1.00) | timed out |
+| **Pass rate** | **2/4** | **2/4** | **2/4** | **2/4** | **0/4** |
+
+### Per-model notes
+
+**qwen3:14b (post-split, new 06-08 scenes):**
+Scored pov_fidelity 1.00 on all three violation scenes (04, 06, 07). scene-07 regressed
+from the pre-split round (previously scored voice_consistency 0.60 ≤ 0.65 in round-2;
+post-split pov_fidelity 1.00). The model correctly scored scene-08 clean POV at 1.00.
+Overall worse than qwen2.5:14b on this metric set — qwen2.5 passes 07 at 0.60 while qwen3
+scores it 1.00. qwen3:14b is not preferred for POV validation.
+
+**cogito:14b:**
+The most promising WORKHORSE_LOCAL result to date for scene-04. cogito correctly scored
+pov_fidelity 0.35 with an explicit weakness finding "POV Switch Without Transition" — the
+first model across all rounds to reliably penalise the first-person intrusion at the score
+level. scene-08 correctly scored 0.95. However, scene-06 (reader address) scored 1.00 with
+no POV findings, and scene-07 (omniscient slip) scored 0.85 — insufficient for the ≤0.65
+threshold despite a "POV transition" weakness finding. cogito:14b demonstrates that a 14B
+model CAN detect and score scene-04 type violations; the limitation is specific to reader-
+address (06) and subtle omniscient slip (07) patterns.
+
+**gemma3:12b:**
+Scored scene-04 pov_fidelity exactly 0.50 (at threshold; PASS) with an explicit "Abrupt
+Perspective Shift" weakness finding. scene-08 scored 1.00 correctly. scene-06 scored 0.70
+(closer to target than qwen models at 1.00 but still above 0.40 threshold). scene-07 scored
+1.00 with no POV findings — regression vs. qwen2.5's 0.60 on that scene. gemma3:12b is
+directionally better than qwen models on 04/06 but does not pass all thresholds.
+
+**phi4-reasoning:latest:**
+Timed out on all 4 scenes at 480s per scene. phi4-reasoning generates extensive chain-of-
+thought output that exceeds practical latency budgets for WORKHORSE_LOCAL use. Not viable for
+this capability regardless of accuracy. Excluded from further evaluation.
+
+### Pattern analysis
+
+Three failure modes are now clearly documented:
+
+1. **Scene-04 (clear first-person intrusion):** cogito:14b and gemma3:12b both detect this
+   correctly. qwen models do not. This violation type is detectable by instruction-tuned 14B
+   models when the POV break is explicit (full first-person paragraph inside close-third).
+
+2. **Scene-06 (reader address):** No tested model reliably scores this below 0.40. The direct
+   address pattern ("I know what you're thinking...") is consistently misread as narrator
+   voice or stylistic device rather than a POV violation. This likely requires either a more
+   capable model or explicit prompt mention of "narrator-to-reader address" as a prohibited
+   pattern.
+
+3. **Scene-07 (omniscient slip):** qwen2.5:14b passes (0.60) but qwen3, cogito, and gemma3
+   do not. The omniscient aside pattern is inconsistently handled — qwen2.5's pass appears
+   to be model-specific behavior rather than a generalizable detection capability. No model
+   reliably passes this threshold across multiple runs.
+
+### Consolidated capability statement
+
+**pov_fidelity scores from all tested WORKHORSE_LOCAL models are advisory only.**
+
+No available WORKHORSE_LOCAL model passes all 4 POV validation thresholds. The best result
+across all models is 2/4 (cogito:14b and gemma3:12b). Gate-eligible POV enforcement at scene
+level requires either:
+
+- A FRONTIER_CLOUD model (e.g., Claude Sonnet/Opus) evaluated against the full scene set
+- A dedicated two-pass POV detection contract (analyze.pov.scene.v1) as a separate
+  capability, possibly using a smaller model fine-tuned for perspective boundary detection
+
+### Recommended decision
+
+Accept the multi-model survey result as a confirmed capability ceiling for WORKHORSE_LOCAL
+at the current model tier. Update the lane record accordingly:
+
+- pov_fidelity is in the schema and is the correct semantic design
+- pov_fidelity scores from WORKHORSE_LOCAL models are advisory only, not gate-eligible
+- scene-04 type violations (clear person-shift intrusion) are detectable by cogito:14b
+  and gemma3:12b but not qwen models
+- scene-06 and scene-07 type violations are not reliably detected by any tested 14B model
+- Run full 5-scene baseline set with qwen2.5:14b against the 6-dimension prompt before
+  candidate_baseline promotion; gate only on schema_reliability and non-POV dimensions
+- Log pov_fidelity limitation in provenance_notes; do not use pov_fidelity as a gate signal
+  until a FRONTIER_CLOUD or dedicated-POV model evaluation is completed
